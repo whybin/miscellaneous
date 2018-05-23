@@ -3,10 +3,12 @@
 # Requires the following: youtube-dl, mpv, jq, (editor of choice)
 
 HELP_TEXT="Usage:
-yours-truly [-w] -f FILENAME save URL
-yours-truly play FILENAME
+yours-truly [OPTIONS] -f FILENAME save URL
+yours-truly [OPTIONS] play FILENAME
 
+Options:
 -w      Overwrite existing playlist file
+-s      Shuffle playlist
 "
 
 # Configurable
@@ -15,13 +17,16 @@ FILE_EXT=m3u8
 FILE_HEADER=#EXTM3U
 EDITOR=nvim
 
-while getopts wf:h opt; do
+while getopts wf:sh opt; do
     case $opt in
         w)
             overwrite=1
             ;;
         f)
             filename=$OPTARG
+            ;;
+        s)
+            shuffle=--shuffle
             ;;
         *)
             echo "$HELP_TEXT"
@@ -46,7 +51,7 @@ case $action in
 
     play)
         filepath=$PLAYLISTS_DIR$2.$FILE_EXT
-        mpv --no-video --playlist $filepath \
+        mpv --no-video --playlist $filepath $shuffle
             --term-playing-msg '\n${media-title}'
         ;;
 
