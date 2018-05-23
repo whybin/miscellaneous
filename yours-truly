@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+# Simple playlist manager to complement youtube-dl
+# Requires the following: youtube-dl, mpv, jq, (editor of choice)
+
+HELP_TEXT="Usage:
+yours-truly [-w] -f FILENAME save URL
+yours-truly play FILENAME
+
+-w      Overwrite existing playlist file
+"
+
+# Configurable
+PLAYLISTS_DIR=~/.mpv/playlists/
+FILE_EXT=m3u8
+FILE_HEADER=#EXTM3U
+EDITOR=nvim
+
+while getopts wf:h opt; do
+    case $opt in
+        w)
+            overwrite=1
+            ;;
+        f)
+            filename=$OPTARG
+            ;;
+        *)
+            echo "$HELP_TEXT"
+            exit 0
+    esac
+done
+shift $((OPTIND - 1))
+
+action=$1
+case $action in
+    save)
+        filepath=$PLAYLISTS_DIR$filename.$FILE_EXT
+        # Add to new playlist files
+        if [ $overwrite ] || [ ! -f $filepath ]; then
+            echo $FILE_HEADER > $filepath
+        fi
+        youtube-dl -j --flat-playlist $2 \
+            | jq -r '@text "https://www.youtube.com/v/\(.id)  # \(.title)"' \
+            >> $filepath
+        $EDITOR $filepath
+        ;;
+
+    play)
+        filepath=$PLAYLISTS_DIR$2.$FILE_EXT
+        mpv --no-video --playlist $filepath \
+            --term-playing-msg '\n${media-title}'
+        ;;
+
+    *)
+        echo "Invalid action: $action"
+        echo "$HELP_TEXT"
+        exit 0
+esac
