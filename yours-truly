@@ -4,6 +4,7 @@
 
 HELP_TEXT="Usage:
 yours-truly [OPTIONS] -f FILENAME save URL
+yours-truly [OPTIONS] list
 yours-truly [OPTIONS] play FILENAME
 yours-truly [OPTIONS] edit FILENAME
 
@@ -48,6 +49,11 @@ case $action in
             | jq -r '@text "https://www.youtube.com/v/\(.id)  # \(.title)"' \
             >> $filepath
         $EDITOR $filepath
+        ;;
+
+    list)
+        ls $PLAYLISTS_DIR | sed s/\.$FILE_EXT$// | tr '\n' '\t'
+        echo
         ;;
 
     play)
