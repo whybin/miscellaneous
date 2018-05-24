@@ -5,7 +5,7 @@
 HELP_TEXT="Usage:
 yours-truly [OPTIONS] -f FILENAME save URL
 yours-truly [OPTIONS] list
-yours-truly [OPTIONS] play FILENAME
+yours-truly [OPTIONS] play FILENAME [-- MPV_OPTIONS]
 yours-truly [OPTIONS] edit FILENAME
 
 Options:
@@ -60,8 +60,9 @@ case $action in
 
     play)
         filepath=$PLAYLISTS_DIR$2.$FILE_EXT
-        mpv --no-video --playlist $filepath $shuffle
-            --term-playing-msg "$TRACK_PREFIX\${media-title}$TRACK_SUFFIX"
+        mpv $shuffle --no-video ${@:4} \
+            --term-playing-msg "$TRACK_PREFIX\${media-title}$TRACK_SUFFIX" \
+            $filepath
         ;;
 
     edit)
