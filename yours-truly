@@ -18,6 +18,8 @@ PLAYLISTS_DIR=~/.mpv/playlists/
 FILE_EXT=m3u8
 FILE_HEADER=#EXTM3U
 EDITOR=nvim
+TRACK_PREFIX='\t♪♬♩  𝄃 \x1b[36m'
+TRACK_SUFFIX='\x1b[0m'
 
 while getopts wf:sh opt; do
     case $opt in
@@ -59,7 +61,7 @@ case $action in
     play)
         filepath=$PLAYLISTS_DIR$2.$FILE_EXT
         mpv --no-video --playlist $filepath $shuffle
-            --term-playing-msg '\n${media-title}'
+            --term-playing-msg "$TRACK_PREFIX\${media-title}$TRACK_SUFFIX"
         ;;
 
     edit)
