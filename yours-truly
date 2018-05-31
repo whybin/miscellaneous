@@ -5,7 +5,7 @@
 HELP_TEXT="Usage:
 yours-truly [OPTIONS] -f FILENAME save URL
 yours-truly [OPTIONS] list
-yours-truly [OPTIONS] play FILENAME [-- MPV_OPTIONS]
+yours-truly [OPTIONS] play FILENAME [...] [-- MPV_OPTIONS]
 yours-truly [OPTIONS] edit FILENAME
 
 Options:
@@ -15,6 +15,7 @@ Options:
 
 # Configurable
 PLAYLISTS_DIR=~/.mpv/playlists/
+TEMP_FILENAME=.temp
 FILE_EXT=m3u8
 FILE_HEADER=#EXTM3U
 EDITOR=nvim
@@ -63,10 +64,18 @@ case $action in
         ;;
 
     play)
-        filepath=$PLAYLISTS_DIR$2.$FILE_EXT
-        mpv $shuffle --no-video ${@:4} \
+        args=${@:2}
+        delim=' -- '
+        if [[ $args = *$delim* ]]; then
+            mpvargs=${args#*$delim}
+        fi
+        filepaths=$(fullpath ${args%$delim*})
+        newfile=$(fullpath $TEMP_FILENAME)
+        cat $filepaths > $newfile
+
+        mpv $shuffle --no-video $mpvargs \
             --term-playing-msg "$TRACK_PREFIX\${media-title}$TRACK_SUFFIX" \
-            $filepath
+            $newfile
         ;;
 
     edit)
