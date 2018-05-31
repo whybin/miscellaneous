@@ -21,6 +21,10 @@ EDITOR=nvim
 TRACK_PREFIX='\t♪♬♩  𝄃 \x1b[36m'
 TRACK_SUFFIX='\x1b[0m'
 
+function fullpath() {
+    echo $* | sed -E "s@([^[:space:]]+)@$PLAYLISTS_DIR\1.$FILE_EXT@g"
+}
+
 while getopts wf:sh opt; do
     case $opt in
         w)
@@ -42,7 +46,7 @@ shift $((OPTIND - 1))
 action=$1
 case $action in
     save)
-        filepath=$PLAYLISTS_DIR$filename.$FILE_EXT
+        filepath=$(fullpath $filename)
         # Add to new playlist files
         if [ $overwrite ] || [ ! -f $filepath ]; then
             echo $FILE_HEADER > $filepath
@@ -66,7 +70,7 @@ case $action in
         ;;
 
     edit)
-        filepath=$PLAYLISTS_DIR$2.$FILE_EXT
+        filepath=$(fullpath $2)
         $EDITOR $filepath
         ;;
 
